@@ -1,0 +1,32 @@
+import csv
+import os
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
+
+CSV_FILE = os.path.join(PROJECT_ROOT, "data", "static_asl_data.csv")
+
+if not os.path.exists(CSV_FILE):
+    print(f"No static CSV data file found to clean at: {CSV_FILE}")
+    exit()
+
+existing_rows_count = 0
+header = ['label'] + [f'coord_{i}' for i in range(63)]
+
+with open(CSV_FILE, mode='r', newline='') as f:
+    reader = csv.reader(f)
+    try:
+        header = next(reader)
+        for row in reader:
+            if row:
+                existing_rows_count += 1
+    except StopIteration:
+        pass
+
+print(f"[INFO] Found {existing_rows_count} recorded samples in '{os.path.basename(CSV_FILE)}'.")
+
+with open(CSV_FILE, mode='w', newline='') as f:
+    writer = csv.writer(f)
+    writer.writerow(header)
+
+print(f"[SUCCESS] Completely cleared all {existing_rows_count} data entries. Structural header preserved.")
